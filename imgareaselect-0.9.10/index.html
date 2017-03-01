@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>imgAreaSelect</title>
+	
+	<link rel="stylesheet" type="text/css" href="css/imgareaselect-animated.css">
+	<script src="scripts/jquery.min.js"></script>
+	<script src="scripts/jquery.imgareaselect.js"></script>
+	<script src="scripts/ajaxfileupload.js"></script>
+
+
+</head>
+<body>
+	<div>
+	    <img src='../Jcrop-0.9.12/portrait/me.jpg' id="mainimg">
+	</div>
+
+	<div id="myPreview" >
+	    <img src="../Jcrop-0.9.12/portrait/me.jpg" id="mainimgthumb" />
+	</div>
+
+    <form name="fmCrop">
+        <input type="hidden" name="src_path"  value="" />
+        <input type="hidden" name="x1" value="" />
+        <input type="hidden" name="x2" value="" />
+        <input type="hidden" name="y1" value="" />
+        <input type="hidden" name="y2" value="" />
+        <input type="submit" name="btnSubmit" class="baseinf_but1" style="display:none" value="确定" />
+    </form>
+	
+	
+	<!-- <form action="crop.php" method="post">
+		<input type="hidden" name="x1" value="" />
+		<input type="hidden" name="y1" value="" />
+		<input type="hidden" name="x2" value="" />
+		<input type="hidden" name="y2" value="" />
+		<input type="hidden" name="w" value="" />
+		<input type="hidden" name="h" value="" />
+	
+		<input type="submit" name="submit" value="Submit" />
+	</form> -->
+
+	<!-- <script type="text/javascript"> 
+		$(document).ready(function () { 
+			$('#photo').imgAreaSelect({ 
+				handles: true, 
+				onSelectEnd: function (img, selection) {
+					$('input[name="x1"]').val(selection.x1);
+					$('input[name="y1"]').val(selection.y1);
+					$('input[name="x2"]').val(selection.x2);
+					$('input[name="y2"]').val(selection.y2);
+					$('input[name="w"]').val(selection.x2 - selection.x1);
+					$('input[name="h"]').val(selection.y2 - selection.y1);
+				}
+			});
+	
+		}); 
+	</script>  -->
+	<script type="text/javascript">
+		$("#mainimg_src", content).load(function () {
+			crop($("#mainimg", content));
+		});
+ 
+		function crop($img) { //$img是
+			//缩小比例
+			var scalex =$img.width() / $("#mainimg_src").width();
+			var scaley =$img.height() / $("#mainimg_src").height();
+
+			$img.imgAreaSelect({
+				x1:0,y1:0,x2:150,y2:150,
+				handles: true, aspectRatio: '1:1',
+				onSelectEnd: function (img, selection) {
+					var scaleX = 100 / (selection.width || 1);
+					var scaleY = 100 / (selection.height || 1);
+
+					$('#mainimgthumb').css({
+						width: Math.round(scaleX * 400) + 'px',
+						height: Math.round(scaleY * 300) + 'px',
+						marginLeft: '-' + Math.round(scaleX * selection.x1) + 'px',
+						marginTop: '-' + Math.round(scaleY * selection.y1) + 'px'
+					});
+
+					$('input[name="x1"]', content).val(selection.x1/scalex);
+					$('input[name="y1"]', content).val(selection.y1/scaley);
+					$('input[name="x2"]', content).val(selection.x2/scalex);
+					$('input[name="y2"]', content).val(selection.y2/scaley);
+				}
+			});
+		}
+
+       //确定剪切
+		$("form[name=fmCrop]", content).submit(function () {
+		    var data = $("form[name=fmCrop]", content).serializeArray();
+		    $.get('/members/web-members-rest/crop.html', data, function (r) {
+		        switch (r.result) {
+		             case "Success":
+		                 jAlert("操作成功");
+		                 $("#left_mainimg").attr("src", "/" + r.path + '?a=' + (new Date()).format('yyyyMMddhhmmss'));
+		                 $("#myPreview", content).css("display", "block");
+		                 $("#myPreview", content).prev().css("display", "none");
+		                 $("#mainimg", content).imgAreaSelect({ hide: true });
+		                 $("form[name=fmUpload]", content).css("display", "none");
+		                 $("input[name=btnSubmit]", content).css("display", "none");
+		                 break;
+		                }
+		    });
+		    return false;
+		});
+	</script>
+	
+</body>
+</html>
